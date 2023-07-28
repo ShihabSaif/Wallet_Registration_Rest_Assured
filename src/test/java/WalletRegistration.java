@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 
 public class WalletRegistration {
@@ -21,13 +22,15 @@ public class WalletRegistration {
 
     public String login_token = "";
 
+    String wallet_no = "01765841108";
+
     @Test(priority = 0)
     void signUp() throws ParseException {
         JSONObject requestBody = new JSONObject();
 
         requestBody.put("device_id", "c02cf9a54e41c047");
-        requestBody.put("mobile_number", "01765841107");
-        requestBody.put("name", "01765841107");
+        requestBody.put("mobile_number", wallet_no);
+        requestBody.put("name", wallet_no);
         requestBody.put("pin", "PIN");
         requestBody.put("role", "CUSTOMER");
         requestBody.put("uuid", "bd5b6dbd-f479-433e-8fb3-d4eda8fa5906");
@@ -37,17 +40,25 @@ public class WalletRegistration {
                 header("Authorization", "Basic cHJvZ290aV9xYTpwcjBnMHQxQDIwMnR3bw==").
                 header("x-auth-token", "GyE7nOpiJMnIiTAFUIocjJ8tEpLLBMSyamKqlKx3").
                 header("x-device-id", "bd5b6dbd-f479-433e-8fb3-d4eda8fa5906").
-                header("x-user-mobile", "01765841107").
+                header("x-user-mobile", wallet_no).
                 body(requestBody.toJSONString()).
                 when().
                 post("https://stgqa.tallykhata.com/wallet/api/tp-proxy/wallet/signup");
 
-        String loginResponse = response.getBody().asString();
+        String signUpResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(signUpResponse);
     }
 
     @Test(priority = 1)
+    void nidClear()
+    {
+        Response response = get("http://10.9.0.77:6060/tallypay-backdoor-service/api/backend/nid/6015326314/reset-nid");
+        String nidClearResponse = response.getBody().asString();
+        System.out.println(nidClearResponse);
+    }
+
+    @Test(priority = 2)
     void nid_front() throws ParseException, IOException {
 
         FileInputStream fisDev = new FileInputStream(System.getProperty("user.dir") + "/src/test/java/walletReg.properties");
@@ -71,12 +82,12 @@ public class WalletRegistration {
                 when().
                 post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-front/user/709668");
 
-        String loginResponse = response.getBody().asString();
+        String nidFrontResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(nidFrontResponse);
     }
 
-    @Test(priority = 2)
+    @Test(priority = 3)
     void nid_back() throws ParseException, IOException {
 
         FileInputStream fisDev = new FileInputStream(System.getProperty("user.dir") + "/src/test/java/walletReg.properties");
@@ -99,12 +110,12 @@ public class WalletRegistration {
                 when().
                 post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-back/user/709668");
 
-        String loginResponse = response.getBody().asString();
+        String nidBackResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(nidBackResponse);
     }
 
-    @Test(priority = 3)
+    @Test(priority = 4)
     void confirm_nid_info() throws ParseException, IOException {
 
         JSONObject requestBody = new JSONObject();
@@ -131,12 +142,12 @@ public class WalletRegistration {
                 when().
                 post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-info");
 
-        String loginResponse = response.getBody().asString();
+        String confirmNidResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(confirmNidResponse);
     }
 
-    @Test(priority = 4)
+    @Test(priority = 5)
     void face_image() throws ParseException, IOException {
 
         FileInputStream fisDev = new FileInputStream(System.getProperty("user.dir") + "/src/test/java/walletReg.properties");
@@ -158,43 +169,43 @@ public class WalletRegistration {
                 when().
                 post("http://10.9.0.77:6060/nobopay-backend/api/document/face-image/user/709668");
 
-        String loginResponse = response.getBody().asString();
+        String profilePictureResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(profilePictureResponse);
     }
 
-    @Test(priority = 5)
+    @Test(priority = 6)
     void pin_set() throws ParseException, IOException {
 
         JSONObject requestBody = new JSONObject();
 
         requestBody.put("new_pin", "1590");
         requestBody.put("uuid", "bd5b6dbd-f479-433e-8fb3-d4eda8fa5906");
-        requestBody.put("wallet_no", "01765841107");
+        requestBody.put("wallet_no", wallet_no);
 
         Response response = given().
                 header("content-type", "application/json").
                 header("Authorization", "Basic cHJvZ290aV9xYTpwcjBnMHQxQDIwMnR3bw==").
                 header("x-auth-token", "GyE7nOpiJMnIiTAFUIocjJ8tEpLLBMSyamKqlKx3").
                 header("x-device-id", "bd5b6dbd-f479-433e-8fb3-d4eda8fa5906").
-                header("x-user-mobile", "01765841106").
+                header("x-user-mobile", wallet_no).
                 body(requestBody.toJSONString()).
                 when().
                 put("https://stgqa.tallykhata.com/wallet/api/tp-proxy/pin/set");
 
-        String loginResponse = response.getBody().asString();
+        String pinSetResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(pinSetResponse);
     }
 
-    @Test(priority = 6)
+    @Test(priority = 7)
     public void login() throws ParseException {
         JSONObject requestBody = new JSONObject();
 
         requestBody.put("app_type", "TALLYKHATA");
         requestBody.put("device_id", "1c2ea1a42bcd5c93");
         requestBody.put("device_type", "ANDROID");
-        requestBody.put("mobile_number", "01765841107");
+        requestBody.put("mobile_number", wallet_no);
         requestBody.put("password", "1590");
         requestBody.put("uuid", "0069a6b1-b510-443b-b51b-db84889ef9f6");
 
@@ -215,16 +226,15 @@ public class WalletRegistration {
         System.out.println(login_token);
     }
 
-    @Test(priority = 7)
+    @Test(priority = 8)
     public void attach_mfs() throws ParseException {
-        System.out.println("token is : " + login_token);
         JSONObject requestBody = new JSONObject();
 
         requestBody.put("otpVerified", true);
         requestBody.put("accountType", "MFS");
         requestBody.put("account_type", "MFS");
         requestBody.put("mfs_type", "BKASH");
-        requestBody.put("wallet_no", "01621215877");
+        requestBody.put("wallet_no", wallet_no);
 
         Response response = given().
                 header("content-type", "application/json").
@@ -233,8 +243,8 @@ public class WalletRegistration {
                 when().
                 post("http://10.9.0.77:6060/nobopay-api-gateway/api/v1/account");
 
-        String loginResponse = response.getBody().asString();
+        String attachMfsResponse = response.getBody().asString();
 
-        System.out.println(loginResponse);
+        System.out.println(attachMfsResponse);
     }
 }
