@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.*;
 import java.util.Properties;
 
 import static io.restassured.RestAssured.get;
@@ -22,7 +23,42 @@ public class WalletRegistration {
 
     public String login_token = "";
 
-    String wallet_no = "01765841108";
+    String wallet_no = "01765841110";
+
+    Connection conn = null;
+
+    Statement statement;
+    ResultSet rs;
+
+    String user_id = "";
+
+
+    public void dbConnectionForProfile() throws ClassNotFoundException, SQLException {
+        Class.forName("org.postgresql.Driver");
+        conn = DriverManager.getConnection("jdbc:postgresql://10.9.0.77:5432/backend_db", "shihab", "shihab@123");
+
+        if (conn != null)
+        {
+            System.out.println("connection established for profile table" + "\n");
+        }
+        else {
+            System.out.println("connection failed for profile table" + "\n");
+        }
+    }
+
+    public void fetchUserIdFromProfile() throws SQLException, ClassNotFoundException {
+        dbConnectionForProfile();
+        String query = String.format("select * from profile pr where pr.wallet_no = '%s'", wallet_no);
+
+        statement = conn.createStatement();
+        rs = statement.executeQuery(query);
+
+        while (rs.next())
+        {
+            user_id = rs.getString("user_id");
+            System.out.println("user_id is : " + user_id);
+        }
+    }
 
     @Test(priority = 0)
     void signUp() throws ParseException {
@@ -59,7 +95,9 @@ public class WalletRegistration {
     }
 
     @Test(priority = 2)
-    void nid_front() throws ParseException, IOException {
+    void nid_front() throws ParseException, IOException, SQLException, ClassNotFoundException {
+
+        fetchUserIdFromProfile();
 
         FileInputStream fisDev = new FileInputStream(System.getProperty("user.dir") + "/src/test/java/walletReg.properties");
         propMain.load(fisDev);
@@ -80,7 +118,7 @@ public class WalletRegistration {
                 header("Authorization", token).
                 body(requestBody.toJSONString()).
                 when().
-                post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-front/user/709668");
+                post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-front/user/" + user_id);
 
         String nidFrontResponse = response.getBody().asString();
 
@@ -108,7 +146,7 @@ public class WalletRegistration {
                 header("Authorization", token).
                 body(requestBody.toJSONString()).
                 when().
-                post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-back/user/709668");
+                post("http://10.9.0.77:6060/nobopay-backend/api/document/nid-back/user/" + user_id);
 
         String nidBackResponse = response.getBody().asString();
 
@@ -120,7 +158,7 @@ public class WalletRegistration {
 
         JSONObject requestBody = new JSONObject();
 
-        requestBody.put("userId", "709668");
+        requestBody.put("userId", user_id);
         requestBody.put("addressPermanent", "Union: ওয়ার্ড নং-০৬, Upazilla: পল্লবী, Post-Code: ১২১৬, Post-Office: পল্লবী পোস্ট অফিস, District: ঢাকা, Division: ঢাকা,");
         requestBody.put("addressPresent", "Union: ওয়ার্ড নং-০৬, Upazilla: পল্লবী, Post-Code: ১২১৬, Post-Office: পল্লবী পোস্ট অফিস, District: ঢাকা, Division: ঢাকা,");
         requestBody.put("birthday", "17/05/1997");
@@ -167,7 +205,7 @@ public class WalletRegistration {
                 header("Authorization", token).
                 body(requestBody.toJSONString()).
                 when().
-                post("http://10.9.0.77:6060/nobopay-backend/api/document/face-image/user/709668");
+                post("http://10.9.0.77:6060/nobopay-backend/api/document/face-image/user/" + user_id);
 
         String profilePictureResponse = response.getBody().asString();
 
