@@ -2,6 +2,7 @@ import io.restassured.response.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
@@ -23,7 +24,7 @@ public class WalletRegistration {
 
     public String login_token = "";
 
-    String wallet_no = "01765841110";
+    String wallet_no = "01765841127";
 
     Connection conn = null;
 
@@ -84,6 +85,8 @@ public class WalletRegistration {
         String signUpResponse = response.getBody().asString();
 
         System.out.println(signUpResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 1)
@@ -92,6 +95,8 @@ public class WalletRegistration {
         Response response = get("http://10.9.0.77:6060/tallypay-backdoor-service/api/backend/nid/6015326314/reset-nid");
         String nidClearResponse = response.getBody().asString();
         System.out.println(nidClearResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 2)
@@ -123,6 +128,8 @@ public class WalletRegistration {
         String nidFrontResponse = response.getBody().asString();
 
         System.out.println(nidFrontResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 3)
@@ -151,6 +158,8 @@ public class WalletRegistration {
         String nidBackResponse = response.getBody().asString();
 
         System.out.println(nidBackResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 4)
@@ -183,6 +192,8 @@ public class WalletRegistration {
         String confirmNidResponse = response.getBody().asString();
 
         System.out.println(confirmNidResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 5)
@@ -210,6 +221,8 @@ public class WalletRegistration {
         String profilePictureResponse = response.getBody().asString();
 
         System.out.println(profilePictureResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 6)
@@ -234,6 +247,8 @@ public class WalletRegistration {
         String pinSetResponse = response.getBody().asString();
 
         System.out.println(pinSetResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 7)
@@ -262,6 +277,8 @@ public class WalletRegistration {
         login_token = "token " + (String) obj.get("token");
 
         System.out.println(login_token);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 
     @Test(priority = 8)
@@ -284,5 +301,7 @@ public class WalletRegistration {
         String attachMfsResponse = response.getBody().asString();
 
         System.out.println(attachMfsResponse);
+
+        Assert.assertEquals(200, response.getStatusCode());
     }
 }
