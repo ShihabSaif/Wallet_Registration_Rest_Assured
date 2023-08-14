@@ -24,7 +24,7 @@ public class WalletRegistration {
 
     public String login_token = "";
 
-    String wallet_no = "01765841127";
+    String wallet_no = "01765841203";
 
     Connection conn = null;
 
